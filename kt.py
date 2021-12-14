@@ -54,7 +54,7 @@ class TourFinder(object):
                 for j in range(n):
                     self.set_square([i, j], (1, 0))
                     if knights_len == 1:
-                        yield [i, j]
+                        yield [[i, j]]
                     else:
                         yield from self.initial_knights(knights_len, [[i, j]])
                     self.square_used[i][j] = 0
