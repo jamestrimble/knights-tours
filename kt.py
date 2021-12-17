@@ -1,5 +1,4 @@
-import json
-import sys
+import json, sys, time
 
 class TourFinder(object):
     moves = [(-2,-1), (-2,1), (-1,-2), (-1,2), (1,-2), (1,2), (2,-1), (2,1)]
@@ -92,20 +91,21 @@ class TourFinder(object):
             if self.search(knights, 1):
                 return self.square_used
 
-def format_result(n, knights_len, k, induced, result):
+def format_result(n, knights_len, k, induced, result, elapsed_time):
     mat = [[None] * knights_len for _ in range(k)]
     for i in range(n):
         for j in range(n):
             d = result[i][j]
             if d != 0:
                 mat[d[0]-1][d[1]] = (i, j)
-    return {"n": n, "knights": knights_len, "k": k, "induced": induced, "tour": mat}
+    return {"n": n, "knights": knights_len, "k": k, "induced": induced, "tour": mat, "time": elapsed_time}
 
 if __name__ == "__main__":
     n = int(sys.argv[1])
     knights_len = int(sys.argv[2])
     k = int(sys.argv[3])
     induced = len(sys.argv) > 4 and sys.argv[4] == "--induced"
+    start_time = time.time()
 
     if k > 0:
         result = TourFinder(n, knights_len, k, induced).find_tour()
@@ -122,6 +122,7 @@ if __name__ == "__main__":
                 result = result_
                 k += 1
     if result:
-        print(json.dumps(format_result(n, knights_len, k, induced, result)))
+        elapsed_time = time.time() - start_time
+        print(json.dumps(format_result(n, knights_len, k, induced, result, elapsed_time)))
     else:
         print("No solution exists")
