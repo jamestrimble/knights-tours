@@ -1,33 +1,38 @@
 #!/bin/bash
 
-# non-induced
+set -o pipefail
 
-TIME_LIMIT=10
+mkdir -p results
 
-(
-for knights in $(seq 2 2); do
-    for n in $(seq 8 9); do
-        timeout $TIME_LIMIT pypy3 kt.py $n $knights -1 | jq -r '[.n,.knights,.k,.induced] | @tsv'
+TIME_LIMIT=5
+
+task(){
+    echo $1 $2 $3
+    local knights=$1
+    local induced=$2
+    local TIME_LIMIT=$3
+    for n in $(seq 8 40); do
+        if ! timeout $TIME_LIMIT pypy3 kt.py $n $knights -1 $induced | jq -r '[.n,.knights,.k,.induced,.time] | @tsv'; then
+            break
+        fi
+    done > results/$knights$induced.txt
+}
+
+echo a
+for induced in '' '--induced'; do
+    for knights in $(seq 2 4); do
+        task "$knights" "$induced" "$TIME_LIMIT" &
     done
 done
+echo b
 
-for knights in $(seq 3 4); do
-    for n in $(seq 8 15); do
-        timeout $TIME_LIMIT pypy3 kt.py $n $knights -1 | jq -r '[.n,.knights,.k,.induced] | @tsv'
+wait
+echo c
+
+rm -f some-results.txt
+
+for induced in '' '--induced'; do
+    for knights in $(seq 2 4); do
+        cat results/$knights$induced.txt
     done
-done
-
-# induced
-
-for knights in $(seq 2 2); do
-    for n in $(seq 8 12); do
-        timeout $TIME_LIMIT pypy3 kt.py $n $knights -1 --induced | jq -r '[.n,.knights,.k,.induced] | @tsv'
-    done
-done
-
-for knights in $(seq 3 4); do
-    for n in $(seq 8 20); do
-        timeout $TIME_LIMIT pypy3 kt.py $n $knights -1 --induced | jq -r '[.n,.knights,.k,.induced] | @tsv'
-    done
-done
-) | tee some-results.txt
+done > some-results.txt
