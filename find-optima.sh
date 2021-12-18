@@ -4,7 +4,7 @@ set -o pipefail
 
 mkdir -p results
 
-TIME_LIMIT=5
+TIME_LIMIT=36000
 
 task(){
     echo $1 $2 $3
