@@ -1,5 +1,6 @@
 //
-// This program is a fairly direct translation of kt.py
+// This program is a fairly direct translation of kt.py.  Unlike the
+// Python program, this one uses branch and bound.
 //
 
 #include <stdio.h>
